@@ -19,7 +19,7 @@ const Footer = () => {
           Create a linkSafe
         </CustomButton>
       </div>
-      <p className="build">Created for Algorand's Build a Bull Hackathon</p>
+      <p className="build">Created for Reown AppKit</p>
     </FooterContainer>
   );
 };

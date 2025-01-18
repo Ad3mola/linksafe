@@ -135,7 +135,7 @@ export const HeaderDropdown = styled.div`
       background-color: #ffffff;
       gap: 1rem;
       cursor: pointer;
-      border-bottom: 1px solid transparent;
+      /* border-bottom: 1px solid transparent; */
       color: unset;
 
       &:hover {
