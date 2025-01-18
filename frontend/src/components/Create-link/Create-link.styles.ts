@@ -11,8 +11,12 @@ export const CreatedLinkContainer = styled.div`
   }
 
   .link__address {
-    border-bottom: 1px solid #653780;
-    background: linear-gradient(180deg, rgba(254, 247, 249, 0) 0%, #fef7f9 100%);
+    /* border-bottom: 1px solid #653780; */
+    background: linear-gradient(
+      180deg,
+      rgba(254, 247, 249, 0) 0%,
+      #fef7f9 100%
+    );
     backdrop-filter: blur(11px);
     padding-bottom: 0.5rem;
     font-family: var(--font-family-nista);

@@ -47,13 +47,14 @@ export const ButtonFlex = styled.div`
 
 export const Button = styled.button`
   border: none;
+  min-height: 35px;
   font-family: var(--font-family-nista);
   white-space: nowrap;
   font-weight: 500;
   font-size: 16px;
   border-radius: 8px;
   text-align: center;
-  padding: 5px 20px;
+  padding: 5px 30px;
   transition: 0.25s ease;
   cursor: pointer;
 
@@ -109,7 +110,7 @@ export const ButtonGradient = styled(Button)`
   transition: none;
 
   &.filled {
-    background: #E53F71;
+    background: #e53f71;
     color: var(--vault-white);
 
     &:hover {

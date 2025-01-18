@@ -17,6 +17,10 @@ export const FooterContainer = styled.div`
   .FooterDiv {
     position: relative;
     width: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
   .ready {
     font-size: 3.4rem;
@@ -27,11 +31,9 @@ export const FooterContainer = styled.div`
   }
   .btn {
     border-radius: 999em;
-    padding: 0.5rem 1rem;
-    postion: absolute;
-    margin-left: 10rem;
+    padding: 0.5rem 2rem;
 
-    background-color: #E53F71;
+    background-color: #e53f71;
   }
   .build {
     margin-top: 2rem;
@@ -50,8 +52,6 @@ export const FooterContainer = styled.div`
       font-family: var(--font-family-nista);
     }
     .btn {
-      postion: absolute;
-      margin-left: 3.3rem;
       font-size: 0.8rem;
     }
   }

@@ -6,8 +6,8 @@ export const SponsorsContainer = styled.div`
   gap: 0.5rem;
   font-family: var(--font-family-nista);
 
-  .algorand {
-    width: 20px;
+  .reown {
+    width: 100px;
   }
 
   .circle {

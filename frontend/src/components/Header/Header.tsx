@@ -1,7 +1,12 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
 import CustomButton from "../Button";
-import { HeaderContainer, LogoContainer, HeaderAddons, HeaderDropdown } from "./Header.styles";
+import {
+  HeaderContainer,
+  LogoContainer,
+  HeaderAddons,
+  HeaderDropdown,
+} from "./Header.styles";
 import { PeraWalletConnect } from "@perawallet/connect";
 import { setCurrentUser, setWalletType } from "../../stores/user/user.reducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,15 +23,18 @@ export const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [handleCopyAddress, setHandleCopyAddress] = useState(false);
-  const address = useSelector((state: RootState) => state.currentUser?.currentUser);
-  const walletType = useSelector((state: RootState) => state.currentUser?.walletType);
+  const address = useSelector(
+    (state: RootState) => state.currentUser?.currentUser
+  );
+  const walletType = useSelector(
+    (state: RootState) => state.currentUser?.walletType
+  );
   const location = useLocation();
-
 
   const peraWalletReconnect = () => {
     peraWallet
       .reconnectSession()
-      .then(accounts => {
+      .then((accounts) => {
         if (accounts.length) {
           dispatch(setCurrentUser(accounts[0]));
           dispatch(setWalletType("pera"));
@@ -37,12 +45,12 @@ export const Header = () => {
           peraWallet.disconnect();
         });
       })
-      .catch(e => console.log(e));
+      .catch((e) => console.log(e));
   };
   const deflyWalletReconnect = () => {
     deflywallet
       .reconnectSession()
-      .then(accounts => {
+      .then((accounts) => {
         if (accounts.length) {
           dispatch(setCurrentUser(accounts[0]));
           dispatch(setWalletType("defly"));
@@ -53,7 +61,7 @@ export const Header = () => {
           deflywallet.disconnect();
         });
       })
-      .catch(e => console.log(e));
+      .catch((e) => console.log(e));
   };
   useEffect(() => {
     if (walletType === "pera") {
@@ -66,7 +74,7 @@ export const Header = () => {
   const peraWalletConnect = () => {
     peraWallet
       .connect()
-      ?.then(accounts => {
+      ?.then((accounts) => {
         peraWallet.connector.on("disconnect", () => {
           dispatch(setCurrentUser(undefined));
           dispatch(setWalletType(""));
@@ -77,7 +85,7 @@ export const Header = () => {
         dispatch(setWalletType("pera"));
         successToast("Successfully connected to Pera Wallet");
       })
-      .catch(error => {
+      .catch((error) => {
         if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
           console.log(error);
         }
@@ -87,7 +95,7 @@ export const Header = () => {
   const deflyWalletConnect = () => {
     deflywallet
       .connect()
-      ?.then(accounts => {
+      ?.then((accounts) => {
         deflywallet.connector.on("disconnect", () => {
           dispatch(setCurrentUser(undefined));
           dispatch(setWalletType(""));
@@ -98,7 +106,7 @@ export const Header = () => {
         dispatch(setWalletType("defly"));
         successToast("Successfully connected to Defly Wallet");
       })
-      .catch(error => {
+      .catch((error) => {
         if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
           console.log(error);
         }
@@ -124,7 +132,7 @@ export const Header = () => {
       <HeaderAddons>
         {location.pathname === "/" ? (
           <a
-            href="https://www.npmjs.com/package/link-safe"
+            href="https://docs.reown.com/?_gl=1*14qp0s1*_ga*NzI3OTI3Mzk1LjE3MzY1MjA2NjM.*_ga_X117BZWK4X*MTczNzIxMDA1OS4zLjEuMTczNzIxMDA1OS4wLjAuMA.."
             target="_blank"
             className="target__blank"
             rel="noreferrer"
@@ -139,7 +147,9 @@ export const Header = () => {
           <CustomButton
             variant="filled"
             type="button"
-            className={address ? "address__button address__main" : "address__main"}
+            className={
+              address ? "address__button address__main" : "address__main"
+            }
           >
             {address ? (
               <span className="address__">
@@ -157,7 +167,7 @@ export const Header = () => {
                     src="/assets/svg/copy.svg"
                     alt="wallet copy"
                     style={{
-                      cursor: "pointer"
+                      cursor: "pointer",
                     }}
                     onClick={() => {
                       setHandleCopyAddress(!handleCopyAddress);
@@ -167,7 +177,11 @@ export const Header = () => {
                     }}
                   />
                 ) : (
-                  <img src="/assets/png/copy.png" alt="copy" className="copy__icon" />
+                  <img
+                    src="/assets/png/copy.png"
+                    alt="copy"
+                    className="copy__icon"
+                  />
                 )}
               </CopyToClipboard>
             )}

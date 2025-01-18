@@ -13,20 +13,23 @@ const accountBalances = async (address: string) => {
   try {
     const publicKey = new PublicKey(address);
     const balance = await connection.getBalance(publicKey);
-    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
-      programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-    });
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+      publicKey,
+      {
+        programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+      }
+    );
 
     const assets = tokenAccounts.value.map((account) => ({
       token: account.account.data.parsed.info.mint,
       amount: account.account.data.parsed.info.tokenAmount.uiAmount,
-      decimals: account.account.data.parsed.info.tokenAmount.decimals
+      decimals: account.account.data.parsed.info.tokenAmount.decimals,
     }));
 
     const balances = {
       sol: balance / 1e9, // Convert lamports to SOL
       assets,
-      minimumBalance: 0 // Solana doesn't enforce a minimum balance like Algorand
+      minimumBalance: 0, // Solana doesn't enforce a minimum balance like Reown
     };
     return balances;
   } catch (err) {
@@ -55,7 +58,7 @@ const createSafe = async () => {
 
     const safe = {
       address: keypair.publicKey.toBase58(),
-      safe: linksafe
+      safe: linksafe,
     };
     return safe;
   } catch (error) {
@@ -81,7 +84,7 @@ const getSafe = async (linksafe: string) => {
       address: publicKey,
       linksafe,
       keypair: { privateKey, publicKey },
-      balances
+      balances,
     };
     console.log(wallet);
     return wallet;
