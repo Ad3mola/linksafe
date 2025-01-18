@@ -1,33 +1,41 @@
 // @ts-nocheck
 
-import algosdk from "algosdk";
+import { Keypair, Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
 import { ed25519 } from "@noble/curves/ed25519";
 import B58 from "./base58";
 import { Buffer } from "buffer";
 
-const algodToken = ""; //API token
-const port = 443;
-const algodServer = "https://mainnet-api.algonode.cloud/";
-const algodClient = new algosdk.Algodv2(algodToken, algodServer, port);
-
+const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 const b58 = new B58();
 const safeUrl = "https://link-safe.netlify.app/lnv";
 
 const accountBalances = async (address: string) => {
-  const accountInfo = await algodClient.accountInformation(address).do();
-  const assets: any = [];
-  const algorand = { amount: accountInfo.amount } as any;
-  algorand["asset-id"] = 0;
-  algorand["is-frozen"] = false;
-  assets.push(algorand, ...accountInfo.assets);
+  try {
+    const publicKey = new PublicKey(address);
+    const balance = await connection.getBalance(publicKey);
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+      publicKey,
+      {
+        programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+      }
+    );
 
-  const balances = {
-    amount: accountInfo.amount,
-    assets: assets,
-    nfts: accountInfo["created-assets"],
-    minimumBalance: accountInfo["min-balance"]
-  };
-  return balances;
+    const assets = tokenAccounts.value.map((account) => ({
+      token: account.account.data.parsed.info.mint,
+      amount: account.account.data.parsed.info.tokenAmount.uiAmount,
+      decimals: account.account.data.parsed.info.tokenAmount.decimals,
+    }));
+
+    const balances = {
+      sol: balance / 1e9, // Convert lamports to SOL
+      assets,
+      minimumBalance: 0, // Solana doesn't enforce a minimum balance like Reown
+    };
+    return balances;
+  } catch (err) {
+    console.error("Error fetching balances:", err);
+    return null;
+  }
 };
 
 const getPublicKey = (priv: Uint8Array): Uint8Array => {
@@ -38,26 +46,23 @@ const getPublicKey = (priv: Uint8Array): Uint8Array => {
 
 const createSafe = async () => {
   try {
-    //generates new algorand Account
-    let account = algosdk.generateAccount();
-    // gets the private keypair uint8 array
-    const keypair = account.sk;
-    //get the private key from the wallet keypair
-    const privateKey = keypair.slice(0, 32);
+    // Generate new Solana keypair
+    const keypair = Keypair.generate();
+    const privateKey = keypair.secretKey.slice(0, 32);
 
-    //converts it to a string
+    // Convert private key to a hex string
     const privateKeyString = Buffer.from(privateKey).toString("hex");
-    //encode to base58
+    // Encode the private key to Base58
     const safeKey = b58.encodeBase58(privateKeyString);
     const linksafe = `${safeUrl}${safeKey}`;
 
     const safe = {
-      address: account.addr,
-      safe: linksafe
+      address: keypair.publicKey.toBase58(),
+      safe: linksafe,
     };
     return safe;
   } catch (error) {
-    console.error(error);
+    console.error("Error creating safe:", error);
     return null;
   }
 };
@@ -66,22 +71,20 @@ const getSafe = async (linksafe: string) => {
   try {
     const safe = linksafe.replace(safeUrl, "");
 
-    //decode from Base58
+    // Decode the private key from Base58
     const hex = b58.decodeBase58(safe);
     const hexBuffer = Buffer.from(hex, "hex");
     const privateKey = new Uint8Array(hexBuffer);
-    const publicKey = getPublicKey(privateKey);
-    const address = algosdk.encodeAddress(publicKey);
-    // const keypair = new Uint8Array([...privateKey, ...publicKey]);
-    linksafe = `${safeUrl}${safe}`;
+    const keypair = Keypair.fromSecretKey(privateKey);
 
-    const balances = await accountBalances(address);
+    const publicKey = keypair.publicKey.toBase58();
+    const balances = await accountBalances(publicKey);
 
     const wallet = {
-      address,
+      address: publicKey,
       linksafe,
       keypair: { privateKey, publicKey },
-      balances
+      balances,
     };
     console.log(wallet);
     return wallet;
