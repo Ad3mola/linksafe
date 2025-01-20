@@ -4,6 +4,7 @@ import OptionLabel from "../Option-Label";
 import { AssetsShowcaseContainer } from "./Assets-Showcase.styles";
 import { useSelector } from "react-redux";
 import { errorToast } from "../../utils/customToast";
+import { useWalletInfo } from "@reown/appkit/react";
 
 interface OwnedAssets {
   ownedAssets: {
@@ -23,10 +24,15 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
   handleSelectAsset,
   selectedAsset,
   showDropdownItems,
-  setShowDropdownItems
+  setShowDropdownItems,
 }: OwnedAssets) => {
-  const dropdownRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+  const dropdownRef: React.RefObject<HTMLDivElement> =
+    useRef<HTMLDivElement>(null);
   const address = useSelector((state: any) => state.currentUser?.currentUser);
+
+  const { walletInfo } = useWalletInfo();
+
+  console.log("walletInfo", walletInfo);
 
   // handles the click event when clicked outside of dropdown
   useEffect(() => {
@@ -57,7 +63,9 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
       errorToast("Please connect your wallet");
       return;
     }
-    params ? setShowDropdownItems(true) : setShowDropdownItems(!showDropdownItems);
+    params
+      ? setShowDropdownItems(true)
+      : setShowDropdownItems(!showDropdownItems);
   };
 
   return (
@@ -75,8 +83,14 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
             {selectedAsset ? (
               <div className="selected__link">
                 <div className="selected__link__item">
-                  <img src={selectedAsset.logo.svg} alt="logo" className="selected__link__icon" />
-                  <p className="selected__link__name">{selectedAsset.unit_name}</p>
+                  <img
+                    src={selectedAsset.logo.svg}
+                    alt="logo"
+                    className="selected__link__icon"
+                  />
+                  <p className="selected__link__name">
+                    {selectedAsset.unit_name}
+                  </p>
                 </div>
                 <p></p>
               </div>
@@ -85,7 +99,11 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
             )}
           </span>
           {!params && (
-            <img src={"/assets/svg/dropdown.svg"} alt="dropdown" className="dropdown__icon" />
+            <img
+              src={"/assets/svg/dropdown.svg"}
+              alt="dropdown"
+              className="dropdown__icon"
+            />
           )}
         </div>
         {showDropdownItems && (
