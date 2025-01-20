@@ -15,8 +15,9 @@ export const HeaderContainer = styled.div`
     padding: 1rem;
   }
 
-  .copy__icon {
+  .solana__icon {
     width: 18px;
+    border-radius: 50%;
   }
 
   .disconnect {

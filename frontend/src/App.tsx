@@ -1,10 +1,11 @@
 import AppRouter from "./routing/AppRouter";
 import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AppKitProvider } from "./providers/AppkitProvider";
 
 function App() {
   return (
-    <>
+    <AppKitProvider>
       <ToastContainer
         closeOnClick={true}
         autoClose={3000}
@@ -15,7 +16,7 @@ function App() {
         pauseOnHover={true}
       />
       <AppRouter />
-    </>
+    </AppKitProvider>
   );
 }
 
