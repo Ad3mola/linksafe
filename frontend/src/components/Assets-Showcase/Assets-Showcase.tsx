@@ -4,6 +4,7 @@ import OptionLabel from "../Option-Label";
 import { AssetsShowcaseContainer } from "./Assets-Showcase.styles";
 import { errorToast } from "../../utils/customToast";
 import { useAppKitAccount } from "@reown/appkit/react";
+import CustomHashLoader from "../CustomHashLoader";
 
 interface OwnedAssets {
   ownedAssets: {
@@ -15,6 +16,8 @@ interface OwnedAssets {
   selectedAsset?: any;
   showDropdownItems: boolean;
   setShowDropdownItems: any;
+  loading: boolean;
+  error: any;
 }
 
 export const AssetsShowcase: React.FC<OwnedAssets> = ({
@@ -24,6 +27,8 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
   selectedAsset,
   showDropdownItems,
   setShowDropdownItems,
+  loading,
+  error,
 }: OwnedAssets) => {
   const dropdownRef: React.RefObject<HTMLDivElement> =
     useRef<HTMLDivElement>(null);
@@ -100,30 +105,48 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
             />
           )}
         </div>
-        {showDropdownItems && (
+        {showDropdownItems && loading && (
           <div className="owned__assets">
-            <h3>Tokens</h3>
-            {tokens.length > 0 &&
-              tokens.map((asset: Asset, i: number) => (
-                <div
-                  className="owned__assets__item"
-                  key={i}
-                  onClick={() => {
-                    if (params) return;
-                    handleSelectAsset(asset);
-                  }}
-                >
-                  <OptionLabel key={i} option={asset} />
-                </div>
-              ))}
-            <h3>Nfts</h3>
-            {nfts.length > 0 ? (
-              nfts.map((nft: Asset, i: number) => (
-                <OptionLabel key={i} option={nft} />
-              ))
-            ) : (
-              <p>There are no nfts in this wallet</p>
-            )}
+            <CustomHashLoader />
+          </div>
+        )}
+        {showDropdownItems && error && (
+          <div className="owned__assets error__container">
+            <p>There was an error fetching your assets</p>
+          </div>
+        )}
+        {showDropdownItems && !loading && !error && (
+          <div className="owned__assets">
+            <div>
+              <h3>Tokens</h3>
+              {tokens.length > 0 ? (
+                tokens.map((asset: Asset, i: number) => (
+                  <div
+                    className="owned__assets__item"
+                    key={i}
+                    onClick={() => {
+                      if (params) return;
+                      handleSelectAsset(asset);
+                    }}
+                  >
+                    <OptionLabel key={i} option={asset} />
+                  </div>
+                ))
+              ) : (
+                <p>There are no tokens in this wallet</p>
+              )}
+            </div>
+
+            <div className="nfts__container">
+              <h3>NFTs</h3>
+              {nfts.length > 0 ? (
+                nfts.map((nft: Asset, i: number) => (
+                  <OptionLabel key={i} option={nft} />
+                ))
+              ) : (
+                <p>There are no nfts in this wallet</p>
+              )}
+            </div>
           </div>
         )}
       </div>

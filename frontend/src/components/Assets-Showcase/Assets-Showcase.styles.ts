@@ -78,7 +78,8 @@ export const AssetsShowcaseContainer = styled.div`
     h3 {
       font-family: var(--font-family-nista);
       font-size: var(--font-size-s);
-      margin: 0.5rem 0rem 0.5rem;
+      margin: 0.8rem 0rem 0.8rem;
+      color: #e53f71;
     }
     p {
       font-family: var(--font-family-nista);
@@ -90,5 +91,18 @@ export const AssetsShowcaseContainer = styled.div`
     &:hover {
       background: #f9f9f9;
     }
+  }
+
+  .error__container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    p {
+      color: var(--vault-error);
+    }
+  }
+
+  .nfts__container {
+    margin-top: 1rem;
   }
 `;

@@ -250,12 +250,15 @@ const CreateLink = () => {
       }
     }
   };
+
   return (
     <>
       {!isVaultResolved ? (
         <Card>
           <h2>Create a linkSafe</h2>
           <AssetsShowcase
+            loading={loading}
+            error={error}
             ownedAssets={{
               tokens,
               nfts,

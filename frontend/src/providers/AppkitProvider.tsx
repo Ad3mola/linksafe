@@ -28,8 +28,22 @@ createAppKit({
   networks,
   projectId,
   features: {
-    onramp: false,
+    onramp: true,
+    swaps: true,
+    email: true, // default to true
+    socials: [
+      "google",
+      "x",
+      "discord",
+      "farcaster",
+      "github",
+      "apple",
+      "facebook",
+    ],
+    emailShowWallets: true, // default to true
   },
+
+  allWallets: "SHOW",
 });
 
 console.log("AppKit initialized", solanaWeb3JsAdapter);
