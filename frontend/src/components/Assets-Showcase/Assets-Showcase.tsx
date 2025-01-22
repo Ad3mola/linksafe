@@ -89,7 +89,7 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
                 <p></p>
               </div>
             ) : (
-              "Algorand standard assets"
+              "Solana assets"
             )}
           </span>
           {!params && (
