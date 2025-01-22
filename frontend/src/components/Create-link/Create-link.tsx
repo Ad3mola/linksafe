@@ -58,7 +58,7 @@ const CreateLink = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
 
-  const { address } = useAppKitAccount();
+  const { address, status } = useAppKitAccount();
 
   const { caipNetwork } = useAppKitNetwork();
 
@@ -68,6 +68,12 @@ const CreateLink = () => {
     address,
     network
   );
+
+  useEffect(() => {
+    if (status === "disconnected") {
+      setSelectedAsset(null);
+    }
+  }, [status]);
 
   const AVAILABLE_ASSETS = async () => {
     const assets = await computeAssets(address);
