@@ -31,7 +31,7 @@ export default defineConfig({
     },
     // From https://github.com/vitejs/vite/issues/9703#issuecomment-1216662109
     commonjsOptions: {
-      include: [],
+      include: ["node_modules/**"],
     },
   },
   optimizeDeps: {
