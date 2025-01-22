@@ -22,7 +22,7 @@
   "homepage": "https://github.com/davon_jagah/Link-safe/tree/main/sdk#readme",
   "dependencies": {
     "@noble/curves": "^1.2.0",
-    "algosdk": "^2.7.0",
+    "@solana/web3.js": "^1.98.0",
     "buffer": "^6.0.3",
     "typescript": "^5.2.2"
   }
