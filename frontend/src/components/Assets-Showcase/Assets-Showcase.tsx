@@ -94,7 +94,7 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
                 <p></p>
               </div>
             ) : (
-              "Solana assets"
+              "Solana Assets"
             )}
           </span>
           {!params && (
