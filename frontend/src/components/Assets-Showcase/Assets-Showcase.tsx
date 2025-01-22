@@ -1,15 +1,14 @@
-import { useEffect, useState, useRef } from "react";
-import { Asset, NFT } from "../../utils/assets.utils";
+import { useEffect, useRef } from "react";
+import { Asset } from "../../utils/assets.utils";
 import OptionLabel from "../Option-Label";
 import { AssetsShowcaseContainer } from "./Assets-Showcase.styles";
-import { useSelector } from "react-redux";
 import { errorToast } from "../../utils/customToast";
-import { useWalletInfo } from "@reown/appkit/react";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 interface OwnedAssets {
   ownedAssets: {
-    assets: Asset[];
-    nfts: NFT[];
+    tokens: Asset[];
+    nfts: Asset[];
   };
   params: boolean;
   handleSelectAsset?: (asset: Asset) => void;
@@ -19,7 +18,7 @@ interface OwnedAssets {
 }
 
 export const AssetsShowcase: React.FC<OwnedAssets> = ({
-  ownedAssets,
+  ownedAssets: { tokens, nfts },
   params,
   handleSelectAsset,
   selectedAsset,
@@ -28,11 +27,8 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
 }: OwnedAssets) => {
   const dropdownRef: React.RefObject<HTMLDivElement> =
     useRef<HTMLDivElement>(null);
-  const address = useSelector((state: any) => state.currentUser?.currentUser);
 
-  const { walletInfo } = useWalletInfo();
-
-  console.log("walletInfo", walletInfo);
+  const { address } = useAppKitAccount();
 
   // handles the click event when clicked outside of dropdown
   useEffect(() => {
@@ -55,7 +51,7 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
 
   useEffect(() => {
     params ? setShowDropdownItems(true) : setShowDropdownItems(false);
-  }, [params]);
+  }, [params, setShowDropdownItems]);
 
   const handleDropdown = () => {
     if (params) return;
@@ -84,13 +80,11 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
               <div className="selected__link">
                 <div className="selected__link__item">
                   <img
-                    src={selectedAsset.logo.svg}
+                    src={selectedAsset.logo}
                     alt="logo"
                     className="selected__link__icon"
                   />
-                  <p className="selected__link__name">
-                    {selectedAsset.unit_name}
-                  </p>
+                  <p className="selected__link__name">{selectedAsset.name}</p>
                 </div>
                 <p></p>
               </div>
@@ -109,8 +103,8 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
         {showDropdownItems && (
           <div className="owned__assets">
             <h3>Tokens</h3>
-            {ownedAssets?.assets?.length > 0 &&
-              ownedAssets.assets.map((asset: Asset, i: number) => (
+            {tokens.length > 0 &&
+              tokens.map((asset: Asset, i: number) => (
                 <div
                   className="owned__assets__item"
                   key={i}
@@ -123,8 +117,8 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
                 </div>
               ))}
             <h3>Nfts</h3>
-            {ownedAssets?.nfts?.length > 0 ? (
-              ownedAssets.assets.map((nft: Asset, i: number) => (
+            {nfts.length > 0 ? (
+              nfts.map((nft: Asset, i: number) => (
                 <OptionLabel key={i} option={nft} />
               ))
             ) : (

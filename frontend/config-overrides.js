@@ -8,15 +8,16 @@ module.exports = function override(config) {
     assert: require.resolve("assert"),
     http: require.resolve("stream-http"),
     https: require.resolve("https-browserify"),
-    url: require.resolve("url")
+    url: require.resolve("url"),
+    os: require.resolve("os-browserify/browser"),
   });
   config.resolve.fallback = fallback;
   config.ignoreWarnings = [/Failed to parse source map/];
   config.plugins = (config.plugins || []).concat([
     new webpack.ProvidePlugin({
       process: "process/browser",
-      Buffer: ["buffer", "Buffer"]
-    })
+      Buffer: ["buffer", "Buffer"],
+    }),
   ]);
   return config;
 };
