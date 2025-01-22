@@ -3,8 +3,8 @@ import { HEROCONTENT } from "../../utils/hero.utils";
 const Hero = () => {
   return (
     <HeroContainer>
-      {HEROCONTENT.map(hero => (
-        <HeroSection className="move-in">
+      {HEROCONTENT.map((hero, index) => (
+        <HeroSection className="move-in" key={index}>
           <HeroSectionContent>
             <div className="hero__header">
               <h2>{hero.title}</h2>

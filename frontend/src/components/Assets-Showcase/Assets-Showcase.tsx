@@ -1,32 +1,39 @@
-import { useEffect, useState, useRef } from "react";
-import { Asset, NFT } from "../../utils/assets.utils";
+import { useEffect, useRef } from "react";
+import { Asset } from "../../utils/assets.utils";
 import OptionLabel from "../Option-Label";
 import { AssetsShowcaseContainer } from "./Assets-Showcase.styles";
-import { useSelector } from "react-redux";
 import { errorToast } from "../../utils/customToast";
+import { useAppKitAccount } from "@reown/appkit/react";
+import CustomHashLoader from "../CustomHashLoader";
 
 interface OwnedAssets {
   ownedAssets: {
-    assets: Asset[];
-    nfts: NFT[];
+    tokens: Asset[];
+    nfts: Asset[];
   };
   params: boolean;
   handleSelectAsset?: (asset: Asset) => void;
   selectedAsset?: any;
   showDropdownItems: boolean;
   setShowDropdownItems: any;
+  loading: boolean;
+  error: any;
 }
 
 export const AssetsShowcase: React.FC<OwnedAssets> = ({
-  ownedAssets,
+  ownedAssets: { tokens, nfts },
   params,
   handleSelectAsset,
   selectedAsset,
   showDropdownItems,
-  setShowDropdownItems
+  setShowDropdownItems,
+  loading,
+  error,
 }: OwnedAssets) => {
-  const dropdownRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
-  const address = useSelector((state: any) => state.currentUser?.currentUser);
+  const dropdownRef: React.RefObject<HTMLDivElement> =
+    useRef<HTMLDivElement>(null);
+
+  const { address } = useAppKitAccount();
 
   // handles the click event when clicked outside of dropdown
   useEffect(() => {
@@ -49,7 +56,7 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
 
   useEffect(() => {
     params ? setShowDropdownItems(true) : setShowDropdownItems(false);
-  }, [params]);
+  }, [params, setShowDropdownItems]);
 
   const handleDropdown = () => {
     if (params) return;
@@ -57,7 +64,9 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
       errorToast("Please connect your wallet");
       return;
     }
-    params ? setShowDropdownItems(true) : setShowDropdownItems(!showDropdownItems);
+    params
+      ? setShowDropdownItems(true)
+      : setShowDropdownItems(!showDropdownItems);
   };
 
   return (
@@ -75,43 +84,69 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
             {selectedAsset ? (
               <div className="selected__link">
                 <div className="selected__link__item">
-                  <img src={selectedAsset.logo.svg} alt="logo" className="selected__link__icon" />
-                  <p className="selected__link__name">{selectedAsset.unit_name}</p>
+                  <img
+                    src={selectedAsset.logo}
+                    alt="logo"
+                    className="selected__link__icon"
+                  />
+                  <p className="selected__link__name">{selectedAsset.name}</p>
                 </div>
                 <p></p>
               </div>
             ) : (
-              "Algorand standard assets"
+              "Solana Assets"
             )}
           </span>
           {!params && (
-            <img src={"/assets/svg/dropdown.svg"} alt="dropdown" className="dropdown__icon" />
+            <img
+              src={"/assets/svg/dropdown.svg"}
+              alt="dropdown"
+              className="dropdown__icon"
+            />
           )}
         </div>
-        {showDropdownItems && (
+        {showDropdownItems && loading && (
           <div className="owned__assets">
-            <h3>Tokens</h3>
-            {ownedAssets?.assets?.length > 0 &&
-              ownedAssets.assets.map((asset: Asset, i: number) => (
-                <div
-                  className="owned__assets__item"
-                  key={i}
-                  onClick={() => {
-                    if (params) return;
-                    handleSelectAsset(asset);
-                  }}
-                >
-                  <OptionLabel key={i} option={asset} />
-                </div>
-              ))}
-            <h3>Nfts</h3>
-            {ownedAssets?.nfts?.length > 0 ? (
-              ownedAssets.assets.map((nft: Asset, i: number) => (
-                <OptionLabel key={i} option={nft} />
-              ))
-            ) : (
-              <p>There are no nfts in this wallet</p>
-            )}
+            <CustomHashLoader />
+          </div>
+        )}
+        {showDropdownItems && error && (
+          <div className="owned__assets error__container">
+            <p>There was an error fetching your assets</p>
+          </div>
+        )}
+        {showDropdownItems && !loading && !error && (
+          <div className="owned__assets">
+            <div>
+              <h3>Tokens</h3>
+              {tokens.length > 0 ? (
+                tokens.map((asset: Asset, i: number) => (
+                  <div
+                    className="owned__assets__item"
+                    key={i}
+                    onClick={() => {
+                      if (params) return;
+                      handleSelectAsset(asset);
+                    }}
+                  >
+                    <OptionLabel key={i} option={asset} />
+                  </div>
+                ))
+              ) : (
+                <p>There are no tokens in this wallet</p>
+              )}
+            </div>
+
+            <div className="nfts__container">
+              <h3>NFTs</h3>
+              {nfts.length > 0 ? (
+                nfts.map((nft: Asset, i: number) => (
+                  <OptionLabel key={i} option={nft} />
+                ))
+              ) : (
+                <p>There are no nfts in this wallet</p>
+              )}
+            </div>
           </div>
         )}
       </div>
