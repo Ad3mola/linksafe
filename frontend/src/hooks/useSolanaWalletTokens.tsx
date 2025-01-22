@@ -14,13 +14,13 @@ import {
  *
  * @param {string} mintAddress - The mint address of the asset.
  * @param {Connection} connection - Solana connection instance.
- * @returns {Promise<SolanaAsset | string>} - Asset details or an error message.
+ * @returns {Promise<SolanaAsset | null>} - Asset details or an error message.
  */
 
 const getSolanaAssetName = async (
   mintAddress: string,
   connection: Connection
-): Promise<SolanaAsset | string> => {
+): Promise<SolanaAsset | null> => {
   const metaplex = new Metaplex(connection);
 
   try {
@@ -38,10 +38,10 @@ const getSolanaAssetName = async (
       return { name: nft.name, logo: metadata.image };
     }
 
-    return "Unknown Asset";
+    return null;
   } catch (error) {
     console.error("Error fetching asset name:", error);
-    return "Error";
+    return null;
   }
 };
 
@@ -52,6 +52,7 @@ const getSolanaAssetName = async (
  * @param {string} [network="solana-mainnet"] - Solana network to connect to.
  * @returns {UseSolanaTokensAndNFTsResult} - Tokens, NFTs, loading state, and error state.
  */
+
 const useSolanaTokensAndNFTs = (
   address: string,
   network: string = "solana-mainnet"
@@ -72,7 +73,6 @@ const useSolanaTokensAndNFTs = (
         );
         const publicKey = new PublicKey(address);
 
-        // Fetch token accounts for the wallet
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
           publicKey,
           {
@@ -80,41 +80,36 @@ const useSolanaTokensAndNFTs = (
           }
         );
 
-        const fetchedTokens: Asset[] = [];
-        const fetchedNFTs: Asset[] = [];
-
-        // Process token accounts
-        tokenAccounts.value.map(async (accountInfo) => {
+        const tokenPromises = tokenAccounts.value.map(async (accountInfo) => {
           const data = accountInfo.account.data.parsed.info;
           const tokenInfo = await getSolanaAssetName(data.mint, connection);
 
-          // Ensure asset has a valid name before including it
-          if (typeof tokenInfo === "string" || !tokenInfo.name) {
-            return;
+          if (!tokenInfo?.name) {
+            return null; // Skip if no valid name is found
           }
 
-          const tokenData: Asset = {
+          return {
             mint: data.mint,
             owner: data.owner,
             amount: data.tokenAmount.uiAmount,
             decimals: data.tokenAmount.decimals,
-            logo: (tokenInfo as SolanaAsset).logo || null,
-            name: (tokenInfo as SolanaAsset).name || "Unknown",
-          };
-
-          // Classify assets as tokens or NFTs
-          if (
-            data.tokenAmount.decimals === 0 &&
-            data.tokenAmount.uiAmount === 1
-          ) {
-            fetchedNFTs.push(tokenData);
-          } else {
-            fetchedTokens.push(tokenData);
-          }
+            logo: tokenInfo.logo || null,
+            name: tokenInfo.name,
+          } as Asset;
         });
 
-        setTokens(fetchedTokens);
-        setNfts(fetchedNFTs);
+        const results = await Promise.all(tokenPromises);
+
+        const filteredTokens = results.filter(
+          (asset) => asset && asset.decimals !== 0
+        ) as Asset[];
+
+        const filteredNFTs = results.filter(
+          (asset) => asset && asset.decimals === 0 && asset.amount === 1
+        ) as Asset[];
+
+        setTokens(filteredTokens);
+        setNfts(filteredNFTs);
       } catch (err: any) {
         console.error("Error fetching tokens and NFTs:", err);
         setError(err.message || "Failed to fetch tokens and NFTs");
