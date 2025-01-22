@@ -77,12 +77,14 @@ export const Header = () => {
                 {address?.substring(0, 5)}...
                 {address?.substring(54, 57)}
               </span>
-              <img
-                // src="/assets/png/sol.png"
-                src={walletInfo.icon}
-                alt="solana"
-                className="solana__icon"
-              />
+              {walletInfo?.icon && (
+                <img
+                  // src="/assets/png/sol.png"
+                  src={walletInfo.icon}
+                  alt="solana"
+                  className="solana__icon"
+                />
+              )}
             </>
           ) : (
             "Connect"

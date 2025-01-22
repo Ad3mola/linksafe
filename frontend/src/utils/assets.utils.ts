@@ -8,16 +8,25 @@ const port = 443;
 const algodServer = "https://mainnet-api.algonode.cloud/";
 const algodClient = new algosdk.Algodv2(algodToken, algodServer, port);
 
-export interface Asset {
-  logo: {
-    svg: string;
-  };
-  id: string;
-  decimals: number;
+export interface SolanaAsset {
   name: string;
-  unit_name: string;
-  url: string;
+  logo: string;
+}
+
+export interface UseSolanaTokensAndNFTsResult {
+  tokens: Asset[];
+  nfts: Asset[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface Asset {
+  mint: string;
+  decimals: number;
+  owner: string;
   amount: number;
+  logo: string;
+  name: string;
 }
 
 interface OwnedAsset {
@@ -43,7 +52,7 @@ const accountBalances = async (address: string) => {
     amount: accountInfo.amount,
     assets: assets,
     nfts: accountInfo["created-assets"],
-    minimumBalance: accountInfo["min-balance"]
+    minimumBalance: accountInfo["min-balance"],
   };
   return balances;
 };
@@ -53,7 +62,8 @@ export const computeAssets = async (address: string) => {
     if (!address) {
       return;
     }
-    const assetsList: Record<string, Asset> | any = await assets.GET_ALL_ASSETS();
+    const assetsList: Record<string, Asset> | any =
+      await assets.GET_ALL_ASSETS();
     if (!assetsList) {
       return;
     }
@@ -71,10 +81,10 @@ export const computeAssets = async (address: string) => {
         return {
           ...(matchingAsset as Asset),
           amount: ownedAsset.amount,
-          minimumBalance: ownedAssets.minimumBalance
+          minimumBalance: ownedAssets.minimumBalance,
         };
       })
-      .filter(asset => asset !== null) as Asset[];
+      .filter((asset) => asset !== null) as Asset[];
 
     const matchingNFTs: NFT[] = ownedAssets.nfts
       .map((ownedNFT: NFT) => {
@@ -87,14 +97,14 @@ export const computeAssets = async (address: string) => {
         return {
           ...(matchingNFT as NFT),
           amount: ownedNFT.amount,
-          minimumBalance: ownedAssets.minimumBalance
+          minimumBalance: ownedAssets.minimumBalance,
         };
       })
-      .filter(nft => nft !== null) as NFT[];
+      .filter((nft) => nft !== null) as NFT[];
 
     return {
       assets: matchingAssets,
-      nfts: matchingNFTs
+      nfts: matchingNFTs,
     };
   } catch (error) {
     console.error("Error fetching or processing assets:", error);

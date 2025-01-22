@@ -67,6 +67,7 @@ export const GlobalStyle = createGlobalStyle`
   :root {
     --vault-white : #ffffff;
     --vault-primary : #653780;
+    --vault-error : #ff0000;
     --font-family-geom : 'Geom', sans-serif;
     --font-family-nista : 'Nista', sans-serif;
     --font-size-xxs: 0.8rem;

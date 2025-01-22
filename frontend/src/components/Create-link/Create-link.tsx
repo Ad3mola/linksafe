@@ -29,8 +29,10 @@ import { setWalletType } from "../../stores/user/user.reducer";
 import PopUp from "../Popup/Popup";
 import { errorToast, successToast } from "../../utils/customToast";
 import algosdk from "algosdk";
+import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
+import useSolanaTokensAndNFTs from "../../hooks/useSolanaWalletTokens";
 interface OwnedAssets {
-  assets: Asset[];
+  tokens: Asset[];
   nfts: NFT[];
 }
 
@@ -43,10 +45,10 @@ const CreateLink = () => {
     useRef<HTMLDivElement>(null);
   const [showDropdownItems, setShowDropdownItems] = useState(false);
   const [ownedAssets, setOwnedAssets] = useState<OwnedAssets>({
-    assets: [],
+    tokens: [],
     nfts: [],
   });
-  const address = useSelector((state: any) => state.currentUser?.currentUser);
+  // const address = useSelector((state: any) => state.currentUser?.currentUser);
   const walletType = useSelector((state: any) => state.currentUser?.walletType);
   const [createdVault, setCreatedVault] = useState<any>(null);
   const navigate = useNavigate();
@@ -56,9 +58,20 @@ const CreateLink = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
 
+  const { address } = useAppKitAccount();
+
+  const { caipNetwork } = useAppKitNetwork();
+
+  const network = (caipNetwork as any).network;
+
+  const { tokens, nfts, loading, error } = useSolanaTokensAndNFTs(
+    address,
+    network
+  );
+
   const AVAILABLE_ASSETS = async () => {
     const assets = await computeAssets(address);
-    setOwnedAssets(assets ?? { assets: [], nfts: [] });
+    setOwnedAssets(assets ?? { tokens: [], nfts: [] });
   };
 
   const algodClient = alogkit.getAlgoClient({
@@ -67,9 +80,7 @@ const CreateLink = () => {
     token: "",
   });
 
-
   const { signer, activeAddress } = useWallet();
-  console.log(activeAddress, "active")
   // const sender = { signer, addr: activeAddress! };
 
   // handles the click event when clicked outside of dropdown
@@ -167,7 +178,7 @@ const CreateLink = () => {
 
   const createEmptyLinkVault = async () => {
     const createdVault = await createSafe();
-    console.log(createdVault, "created")
+    console.log(createdVault, "created");
     if (createdVault.address) {
       setCreatedVault(createdVault);
       successToast("Link created successfully");
@@ -192,20 +203,22 @@ const CreateLink = () => {
         `You do not have sufficient balance to make this transaction`
       );
 
-  const params = await algodClient.getTransactionParams().do();
-  const txn = algosdk.makeApplicationCallTxnFromObject({
-    from : address,
-    appIndex: 0,
-    onComplete: algosdk.OnApplicationComplete.NoOpOC,
-    suggestedParams: params,
-    appArgs : []
-  })
+    const params = await algodClient.getTransactionParams().do();
+    const txn = algosdk.makeApplicationCallTxnFromObject({
+      from: address,
+      appIndex: 0,
+      onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      suggestedParams: params,
+      appArgs: [],
+    });
 
-  // Get the transaction signed by Pera Wallet
-  const signedTxn = await peraWallet.signTransaction([[{ txn, signers: [address] }]]);
-    
-  // // Send the transaction
-  // const { txId } = await algodClient.sendRawTransaction(signedTxn).do();
+    // Get the transaction signed by Pera Wallet
+    const signedTxn = await peraWallet.signTransaction([
+      [{ txn, signers: [address] }],
+    ]);
+
+    // // Send the transaction
+    // const { txId } = await algodClient.sendRawTransaction(signedTxn).do();
     const createdVault = await createSafe();
     // console.log(createdVault)
     if (createdVault.address) {
@@ -236,15 +249,20 @@ const CreateLink = () => {
         successToast("Link created successfully");
       }
     }
-
   };
+
   return (
     <>
       {!isVaultResolved ? (
         <Card>
           <h2>Create a linkSafe</h2>
           <AssetsShowcase
-            ownedAssets={ownedAssets}
+            loading={loading}
+            error={error}
+            ownedAssets={{
+              tokens,
+              nfts,
+            }}
             params={false}
             handleSelectAsset={handleSelectAsset}
             selectedAsset={selectedAsset}
@@ -255,7 +273,7 @@ const CreateLink = () => {
             <h3>Amount</h3>
             <input
               type="number"
-              placeholder={selectedAsset ? `0 ${selectedAsset.unit_name}` : "0"}
+              placeholder={selectedAsset ? `0 ${selectedAsset.name}` : "0"}
               className="input__amount"
               onChange={(e) => setAmount(e.target.value)}
             />
