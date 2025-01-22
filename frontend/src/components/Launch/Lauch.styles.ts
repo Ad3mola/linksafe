@@ -90,9 +90,9 @@ export const LaunchContainer = styled.div`
       border: solid 1px var(--vault-primary);
       border-radius: 6px;
       cursor: pointer;
-      background: #E53F7124;
+      background: #e53f7124;
       &:hover {
-        background: #E53F71;
+        background: #e53f71;
         color: white;
       }
     }
@@ -128,7 +128,11 @@ export const LaunchContainer = styled.div`
 
   .launch__body {
     border: solid 2px var(--vault-primary);
-    background: linear-gradient(180deg, rgba(254, 247, 249, 0) 0%, #fef7f9 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(254, 247, 249, 0) 0%,
+      #fef7f9 100%
+    );
     box-shadow: 0px 23px 28px 0px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
     border-radius: 10px;
@@ -152,7 +156,7 @@ export const LaunchContainer = styled.div`
       }
 
       .claim__button {
-        background: #E53F71;
+        background: #e53f71;
       }
 
       .deposit__button {

@@ -58,8 +58,9 @@ export const AssetsShowcaseContainer = styled.div`
   }
 
   .owned__assets {
-    width: 500px;
+    width: 100%;
     position: absolute;
+    left: 0;
     background: white;
     padding: 1rem;
     z-index: 3;
@@ -81,6 +82,13 @@ export const AssetsShowcaseContainer = styled.div`
     }
     p {
       font-family: var(--font-family-nista);
+    }
+  }
+
+  .owned__assets__item > div {
+    height: 40px;
+    &:hover {
+      background: #f9f9f9;
     }
   }
 `;
