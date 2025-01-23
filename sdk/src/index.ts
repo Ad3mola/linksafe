@@ -9,12 +9,14 @@ const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 const b58 = new B58();
 const safeUrl = "https://linksafe-reown.vercel.app/lnv";
 
-
+//Function to get Public key
 const getPublicKey = (priv: Uint8Array): Uint8Array => {
   const privateKeyString = Buffer.from(priv).toString("hex");
   const pub = ed25519.getPublicKey(privateKeyString);
   return pub;
 };
+
+//Create link safe
 
 const createSafe = async () => {
   try {
