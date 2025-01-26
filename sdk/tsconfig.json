@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",     // Compiled files go to 'dist' folder
-    "declaration": true,     // Generate type declaration files
+    "target": "ES2020",
     "module": "CommonJS",
-    "target": "ES6",
-    "moduleResolution": "node",
+    "strict": true,
     "esModuleInterop": true,
-    "strict": true
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "declaration": true
   },
-  "include": ["./src/index.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
