@@ -1,7 +1,11 @@
 // @ts-nocheck
 
 import { useEffect, useState, useRef } from "react";
-import { ScrollProgress, ScrollSection, ScrollContainerP } from "./Scroll-Container.styles";
+import {
+  ScrollProgress,
+  ScrollSection,
+  ScrollContainerP,
+} from "./Scroll-Container.styles";
 
 const ScrollContainer: React.FC = () => {
   const [scrollPercentage, setScrollPercentage] = useState<number>(0);
@@ -11,8 +15,10 @@ const ScrollContainer: React.FC = () => {
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-    const newScrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
+    const { scrollTop, scrollHeight, clientHeight } =
+      scrollContainerRef.current;
+    const newScrollPercentage =
+      (scrollTop / (scrollHeight - clientHeight)) * 100;
     setScrollPercentage(newScrollPercentage);
     // Cancel the previous animation frame request
     if (rafId.current !== null) {
@@ -56,14 +62,14 @@ const ScrollContainer: React.FC = () => {
         <div className="section__first__content">
           <h1> 2. </h1>
           <h2>Fund with Digital Asset(s).</h2>
-          <p>Fund your link safe with algorand asset or NFT(s).</p>
+          <p>Fund your link safe with solana asset or NFT(s).</p>
         </div>
       </ScrollSection>
       <ScrollSection visible={scrollPercentage > 66 && scrollPercentage <= 100}>
         <div className="section__first__content">
           <h1> 3. </h1>
           <h2>Share with love. </h2>
-          <p>Share your Link and claim to your algorand wallet </p>
+          <p>Share your Link and claim to your solana wallet </p>
         </div>
       </ScrollSection>
       <div className="scroll__percent">
