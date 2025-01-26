@@ -1,29 +1,32 @@
 {
-  "name": "link-safe",
-  "version": "1.4.0",
-  "description": "Integrating LinkSafe: Paving the Way for Widespread Crypto and Algorand Adoption, Providing Non Custodial algorand wallets via a simple link or QR. Including Algorand Standard Asset Integration.",
-  "main": "./src/index.ts",
+  "name": "linksafe-sdk",
+  "version": "1.0.1",
+  "description": "LinkSafe SDK for Solana wallet management",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BadgerV/Link-safe.git#main"
+    "url": "https://github.com/davonjagah/linksafe-reown/tree/main/sdk"
   },
-  "keywords": [
-    "linksafe"
-  ],
-  "author": "David Kazeem",
+  "keywords": ["solana", "sdk", "wallet", "cryptocurrency"],
+  "author": "Your Name",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/davon_jagah/Link-safe/issues"
-  },
-  "homepage": "https://github.com/davon_jagah/Link-safe/tree/main/sdk#readme",
   "dependencies": {
-    "@noble/curves": "^1.2.0",
-    "algosdk": "^2.7.0",
-    "buffer": "^6.0.3",
-    "typescript": "^5.2.2"
+    "@metaplex/js": "^4.12.0",
+    "@noble/curves": "^1.8.1",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0",
+    "buffer": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "typescript": "^5.7.3",
+    "jest": "^27.3.1",
+    "ts-jest": "^27.0.7"
   }
 }

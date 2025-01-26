@@ -1,54 +1,26 @@
-// @ts-nocheck
-
 import { Keypair, Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
+import {TOKEN_PROGRAM_ID } from "@solana/spl-token";
+
 import { ed25519 } from "@noble/curves/ed25519";
 import B58 from "./base58";
 import { Buffer } from "buffer";
 
 const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 const b58 = new B58();
-const safeUrl = "https://link-safe.netlify.app/lnv";
+const safeUrl = "https://linksafe-reown.vercel.app/lnv";
 
-const accountBalances = async (address: string) => {
-  try {
-    const publicKey = new PublicKey(address);
-    const balance = await connection.getBalance(publicKey);
-    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-      publicKey,
-      {
-        programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-      }
-    );
-
-    const assets = tokenAccounts.value.map((account) => ({
-      token: account.account.data.parsed.info.mint,
-      amount: account.account.data.parsed.info.tokenAmount.uiAmount,
-      decimals: account.account.data.parsed.info.tokenAmount.decimals,
-    }));
-
-    const balances = {
-      sol: balance / 1e9, // Convert lamports to SOL
-      assets,
-      minimumBalance: 0, // Solana doesn't enforce a minimum balance like Reown
-    };
-    return balances;
-  } catch (err) {
-    console.error("Error fetching balances:", err);
-    return null;
-  }
-};
-
+// Function to get Public Key
 const getPublicKey = (priv: Uint8Array): Uint8Array => {
-  const privateKeyString = Buffer.from(priv).toString("hex");
-  const pub = ed25519.getPublicKey(privateKeyString);
+  const pub = ed25519.getPublicKey(priv);
   return pub;
 };
 
+// Function to create a link-safe
 const createSafe = async () => {
   try {
     // Generate new Solana keypair
     const keypair = Keypair.generate();
-    const privateKey = keypair.secretKey.slice(0, 32);
+    const privateKey = keypair.secretKey; // Keep the full secret key (64 bytes)
 
     // Convert private key to a hex string
     const privateKeyString = Buffer.from(privateKey).toString("hex");
@@ -67,6 +39,8 @@ const createSafe = async () => {
   }
 };
 
+
+// Function to resolve a link-safe
 const getSafe = async (linksafe: string) => {
   try {
     const safe = linksafe.replace(safeUrl, "");
@@ -74,6 +48,12 @@ const getSafe = async (linksafe: string) => {
     // Decode the private key from Base58
     const hex = b58.decodeBase58(safe);
     const hexBuffer = Buffer.from(hex, "hex");
+
+    // Ensure the private key is 64 bytes
+    if (hexBuffer.length !== 64) {
+      throw new Error("Invalid private key length");
+    }
+
     const privateKey = new Uint8Array(hexBuffer);
     const keypair = Keypair.fromSecretKey(privateKey);
 
@@ -94,4 +74,33 @@ const getSafe = async (linksafe: string) => {
   }
 };
 
-export { getSafe, createSafe };
+
+const accountBalances = async (publicKey: string): Promise<Record<string, string>> => {
+  try {
+      const publicKeyObj = new PublicKey(publicKey);
+
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+          publicKeyObj,
+          {
+              programId: TOKEN_PROGRAM_ID,
+          }
+      );
+
+      const tokenBalances: Record<string, string> = {}; 
+
+      for (const { account } of tokenAccounts.value) {
+          const tokenAmount = account.data.parsed.info.tokenAmount;
+          const mint = account.data.parsed.info.mint;
+
+          tokenBalances[mint] = tokenAmount.uiAmountString; 
+      }
+
+      return tokenBalances;
+  } catch (error) {
+      console.error("Error fetching balances:", error);
+      return {}; 
+  }
+};
+
+
+export { getSafe, createSafe, getPublicKey };
