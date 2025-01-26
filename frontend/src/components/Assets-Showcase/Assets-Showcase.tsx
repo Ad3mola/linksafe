@@ -14,8 +14,8 @@ interface OwnedAssets {
   params: boolean;
   handleSelectAsset?: (asset: Asset) => void;
   selectedAsset?: any;
-  showDropdownItems: boolean;
-  setShowDropdownItems: any;
+  showDropdownItems?: boolean;
+  setShowDropdownItems?: any;
   loading: boolean;
   error: any;
 }
@@ -119,7 +119,7 @@ export const AssetsShowcase: React.FC<OwnedAssets> = ({
           <div className="owned__assets">
             <div>
               <h3>Tokens</h3>
-              {tokens.length > 0 ? (
+              {tokens?.length > 0 ? (
                 tokens.map((asset: Asset, i: number) => (
                   <div
                     className="owned__assets__item"
