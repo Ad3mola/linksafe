@@ -6,7 +6,7 @@ import B58 from "./base58";
 import { Buffer } from "buffer";
 
 
-const connection = new Connection("https://solana-mainnet.api.syndica.io/api-key/2rx11auHBcq6zJWiq5v3MaMRN5zTPgpoFFfsEs1Qxj7tb2rw1NsERKE3DRnH99NMLHQpeVya8dw6DVXo7URBWJRGBQCHR1AKpmR", "confirmed");
+const connection = new Connection("https://small-nameless-field.solana-mainnet.quiknode.pro/418a369a0a72535a7c9b931203666f94d9762ea9/", "confirmed");
 const b58 = new B58();
 const safeUrl = "https://linksafe-reown.vercel.app/lnv";
 
@@ -67,7 +67,7 @@ const getSafe = async (linksafe: string) => {
       keypair: { privateKey, publicKey },
       balances,
     };
-    console.log(wallet);
+    // console.log(wallet);
     return wallet;
   } catch (err) {
     console.error("Safe could not be resolved", err);
