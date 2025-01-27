@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { getSolanaAssetName } from "../hooks/useSolanaWalletTokens";
+
 export interface SolanaAsset {
   name: string;
   logo: string;
@@ -49,23 +51,43 @@ const resolveAssets = async (results: any) => {
   return { tokens: filteredTokens, nfts: filteredNFTs };
 };
 
-export const computeAssets = (vaultInfo) => {
+export const computeAssets = async (vaultInfo, connection) => {
   try {
     if (!vaultInfo.address) {
       return;
     }
-    const assetsList: Record<string, Asset> | any = vaultInfo.balances;
+
+    // Transform balances object into an array
+    const assetsList = Object.entries(vaultInfo.balances).map(
+      ([key, value]) => ({
+        mint: key,
+        balance: value,
+      })
+    );
 
     if (!assetsList) {
       return;
     }
 
-    const assetsArray = Object.values(assetsList);
-    const ownedAssets = resolveAssets(assetsArray);
+    const tokenPromises = assetsList.map(async (asset) => {
+      const tokenInfo = await getSolanaAssetName(asset.mint, connection);
+
+      if (!tokenInfo?.name) {
+        return null; // Skip if no valid name is found
+      }
+
+      return {
+        logo: tokenInfo.logo || null,
+        name: tokenInfo.name,
+        amount: Number(asset.balance),
+      };
+    });
+
+    const results = await Promise.all(tokenPromises);
 
     return {
-      assets: ownedAssets.tokens ?? [],
-      nfts: ownedAssets.nfts ?? [],
+      assets: results ?? [],
+      nfts: [],
     };
   } catch (error) {
     console.error("Error fetching or processing assets:", error);
