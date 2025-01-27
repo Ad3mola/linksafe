@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "generate:app-clients": "algokit project link --all",
     "dev": "vite",
     "build": "tsc && vite build",
     "Lint": "eslint . --ext ts, tsc --report-unused-disable-directrives --max-warnings 0",
@@ -29,7 +28,6 @@
     ]
   },
   "dependencies": {
-    "@algorandfoundation/algokit-utils": "6.0.2",
     "@blockshake/defly-connect": "^1.1.6",
     "@metaplex-foundation/digital-asset-standard-api": "^1.0.4",
     "@metaplex-foundation/js": "^0.20.1",
@@ -42,16 +40,16 @@
     "@reown/appkit-adapter-wagmi": "^1.6.4",
     "@solana/spl-token": "^0.4.9",
     "@solana/spl-token-registry": "^0.2.4574",
+    "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/web3.js": "^1.98.0",
     "@tanstack/react-query": "^5.64.2",
-    "@txnlab/use-wallet": "2.4.0",
     "@walletconnect/modal-sign-html": "^2.6.1",
-    "algosdk": "^2.7.0",
     "axios": "^1.6.1",
     "clsx": "^2.0.0",
     "dotenv": "^16.4.7",
     "isomorphic-fetch": "^3.0.0",
-    "link-safe": "1.4.0",
+    "linksafe-sdk": "^1.0.1",
     "notistack": "^3.0.1",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
@@ -72,7 +70,6 @@
     "web3": "^4.16.0"
   },
   "devDependencies": {
-    "@algorandfoundation/algokit-client-generator": "^3.0.3",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-private-property-in-object": "^7.22.11",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
