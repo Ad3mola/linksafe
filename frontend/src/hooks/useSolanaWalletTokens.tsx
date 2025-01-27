@@ -17,7 +17,7 @@ import {
  * @returns {Promise<SolanaAsset | null>} - Asset details or an error message.
  */
 
-const getSolanaAssetName = async (
+export const getSolanaAssetName = async (
   mintAddress: string,
   connection: Connection
 ): Promise<SolanaAsset | null> => {

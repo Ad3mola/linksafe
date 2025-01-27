@@ -61,7 +61,7 @@ const CreateLink = () => {
   }, [status]);
 
   const AVAILABLE_ASSETS = async () => {
-    const assets = await computeAssets(address);
+    const assets = await computeAssets(address, connection);
     setOwnedAssets(assets ?? { tokens: [], nfts: [] });
   };
 

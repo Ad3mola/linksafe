@@ -1,6 +1,6 @@
 {
   "name": "linksafe-sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "LinkSafe SDK for Solana wallet management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
     "url": "https://github.com/davonjagah/linksafe-reown/tree/main/sdk"
   },
   "keywords": ["solana", "sdk", "wallet", "cryptocurrency"],
-  "author": "Your Name",
+  "author": "David Kazeem",
   "license": "ISC",
   "dependencies": {
     "@metaplex/js": "^4.12.0",
