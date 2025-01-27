@@ -33,7 +33,6 @@ const LaunchVault = () => {
     setIsLoading(true);
     const nobleCurveKey = `${REACT_APP_CLIENT_URL}${location.pathname}`;
     const res = await getSafe(nobleCurveKey);
-    console.log(res, "noblecurvekey");
     setVaultNobleLink(res);
     setIsLoading(false);
     return res;
@@ -41,8 +40,7 @@ const LaunchVault = () => {
 
   const AVAILABLE_ASSETS = async () => {
     setIsLoading(true);
-    const assets = computeAssets(vaultNobleLink);
-    console.log(assets, "WHEN");
+    const assets = await computeAssets(vaultNobleLink, connection);
     setOwnedAssets({ assets: assets.assets, nfts: assets.nfts });
 
     setIsLoading(false);
@@ -112,6 +110,7 @@ const LaunchVault = () => {
               <CustomButton
                 variant="filled"
                 type="button"
+                disabled={ownedAssets.assets.length === 0}
                 className="claim__button"
                 onClick={() => setShowPopup(true)}
               >
