@@ -5,7 +5,8 @@ import { ed25519 } from "@noble/curves/ed25519";
 import B58 from "./base58";
 import { Buffer } from "buffer";
 
-const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
+
+const connection = new Connection("https://solana-mainnet.api.syndica.io/api-key/2rx11auHBcq6zJWiq5v3MaMRN5zTPgpoFFfsEs1Qxj7tb2rw1NsERKE3DRnH99NMLHQpeVya8dw6DVXo7URBWJRGBQCHR1AKpmR", "confirmed");
 const b58 = new B58();
 const safeUrl = "https://linksafe-reown.vercel.app/lnv";
 
