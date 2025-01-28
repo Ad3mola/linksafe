@@ -14,112 +14,117 @@ import { claimVault } from "../../utils/integration";
 import { LoadingState } from "../LoadingState/LoadingState";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useAppKitConnection } from "@reown/appkit-adapter-solana/react";
+
 const REACT_APP_CLIENT_URL = import.meta.env.VITE_APP_CLIENT_URL;
 
 const LaunchVault = () => {
-  const [ownedAssets, setOwnedAssets] = useState<any>({ assets: [], nfts: [] });
-  const [vaultNobleLink, setVaultNobleLink] = useState<any>(null);
+  const [ownedAssets, setOwnedAssets] = useState({ assets: [], nfts: [] });
+  const [vaultNobleLink, setVaultNobleLink] = useState(null);
   const [showDropdownItems, setShowDropdownItems] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [handleCopyAddress, setHandleCopyAddress] = useState(false);
   const [showDepositPopup, setShowDepositPopup] = useState(false);
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
-  const { address } = useAppKitAccount();
+  const [error, setError] = useState(false);
 
+  const location = useLocation();
+  const { address } = useAppKitAccount();
   const { connection } = useAppKitConnection();
 
-  const getSafeNobleLink = async () => {
-    setIsLoading(true);
-    const nobleCurveKey = `${REACT_APP_CLIENT_URL}${location.pathname}`;
-    const res = await getSafe(nobleCurveKey);
-    setVaultNobleLink(res);
-    setIsLoading(false);
-    return res;
+  // Fetch noble link for the vault
+  const fetchVaultNobleLink = async () => {
+    const nobleCurveKey = `https://linksafe-reown.vercel.app${location.pathname}`;
+    try {
+      const res = await getSafe(nobleCurveKey);
+      setVaultNobleLink(res);
+      return res;
+    } catch (err) {
+      console.error("Error fetching Noble link:", err);
+      setError(true);
+    }
   };
 
-  const AVAILABLE_ASSETS = async () => {
-    setIsLoading(true);
-    const assets = await computeAssets(vaultNobleLink, connection);
-    setOwnedAssets({ assets: assets.assets, nfts: assets.nfts });
+  // Fetch available assets
+  const fetchAvailableAssets = async () => {
+    try {
+      const assets = await computeAssets(vaultNobleLink, connection);
+      setOwnedAssets({ assets: assets.assets, nfts: assets.nfts });
 
-    setIsLoading(false);
+      if (assets.error) {
+        setError(true);
+      } else {
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error("Error fetching assets:", err);
+      setError(true);
+      setIsLoading(false);
+    }
   };
 
-  // const vaultLink =
+  // Fetch vault noble link on component mount
   useEffect(() => {
-    setIsLoading(true);
     (async () => {
-      const result = await getSafeNobleLink();
-      // if (!result) navigate("/");
+      await fetchVaultNobleLink();
     })();
-    setIsLoading(false);
   }, []);
 
+  // Fetch available assets when vaultNobleLink is updated
   useEffect(() => {
-    setIsLoading(true);
-    if (!vaultNobleLink) return;
-    AVAILABLE_ASSETS();
-    setIsLoading(false);
+    if (vaultNobleLink) {
+      fetchAvailableAssets();
+    }
   }, [vaultNobleLink]);
 
+  // Handle claim action
   const handleClaim = async () => {
-    const vault: any = await claimVault(
-      vaultNobleLink,
-      address,
-      connection,
-      ownedAssets
-    );
-
-    setShowPopup(false);
-    setTimeout(() => {
-      window.location.reload();
-    }, 3200);
+    try {
+      await claimVault(vaultNobleLink, address, connection, ownedAssets);
+      setShowPopup(false);
+      setTimeout(() => window.location.reload(), 3200);
+    } catch (err) {
+      console.error("Error claiming assets:", err);
+    }
   };
 
   return (
     <LaunchContainer>
-      {isLoading ? (
-        <LoadingState width={500} height={"50vh"} />
-      ) : (
-        <div className="launch__">
-          <div className="launch__header">
-            <h3>Welcome,</h3>
-          </div>
-          <div className="launch__body">
-            <AssetsShowcase
-              loading={false}
-              error={null}
-              ownedAssets={{
-                tokens: ownedAssets.assets,
-                nfts: ownedAssets.nfts,
-              }}
-              params={true}
-              setShowDropdownItems={setShowDropdownItems}
-              showDropdownItems={showDropdownItems}
-            />
-            <div className="buttons__container">
-              <CustomButton
-                variant="filled"
-                type="button"
-                className="deposit__button"
-                onClick={() => setShowDepositPopup(true)}
-              >
-                Deposit
-              </CustomButton>
-              <CustomButton
-                variant="filled"
-                type="button"
-                disabled={ownedAssets.assets.length === 0}
-                className="claim__button"
-                onClick={() => setShowPopup(true)}
-              >
-                Claim
-              </CustomButton>
-            </div>
+      <div className="launch__">
+        <div className="launch__header">
+          <h3>Welcome,</h3>
+        </div>
+        <div className="launch__body">
+          <AssetsShowcase
+            loading={isLoading}
+            error={error}
+            ownedAssets={{
+              tokens: ownedAssets.assets,
+              nfts: ownedAssets.nfts,
+            }}
+            params={true}
+            setShowDropdownItems={setShowDropdownItems}
+            showDropdownItems={showDropdownItems}
+          />
+          <div className="buttons__container">
+            <CustomButton
+              variant="filled"
+              className="deposit__button"
+              onClick={() => setShowDepositPopup(true)}
+            >
+              Deposit
+            </CustomButton>
+            <CustomButton
+              variant="filled"
+              className="claim__button"
+              disabled={ownedAssets.assets.length === 0}
+              onClick={() => setShowPopup(true)}
+            >
+              Claim
+            </CustomButton>
           </div>
         </div>
-      )}
+      </div>
+
       {showPopup && (
         <PopUp isOpen={showPopup} onClose={() => setShowPopup(false)}>
           <div className="popup__modal">
@@ -127,7 +132,7 @@ const LaunchVault = () => {
             <div className="popup__container">
               <div className="popup__first" onClick={handleClaim}>
                 <h3>via the connected wallet</h3>
-                <p>Asset will be sent to the connected solana wallet</p>
+                <p>Assets will be sent to the connected Solana wallet</p>
               </div>
               <div className="popup__second">
                 <a
@@ -135,10 +140,10 @@ const LaunchVault = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <h3>via remit flex</h3>
+                  <h3>via Remit Flex</h3>
                   <p>
                     Make remittances and pay over 18,000 bill categories in
-                    africa
+                    Africa
                   </p>
                 </a>
               </div>
@@ -150,40 +155,36 @@ const LaunchVault = () => {
           </div>
         </PopUp>
       )}
+
       {showDepositPopup && (
         <PopUp
           isOpen={showDepositPopup}
           onClose={() => setShowDepositPopup(false)}
         >
           <div className="popup__modal">
-            <h2 className="deposit">Deposit asset via vault wallet address</h2>
+            <h2 className="deposit">Deposit assets via vault wallet address</h2>
             <div className="popup__container noble__link">
-              <QRCode value={vaultNobleLink.address} />
-
-              <CopyToClipboard text={vaultNobleLink.address}>
+              <QRCode value={vaultNobleLink?.address || ""} />
+              <CopyToClipboard text={vaultNobleLink?.address || ""}>
                 <CustomButton
                   variant="filled"
                   className="button__transparent"
                   onClick={() => {
-                    setHandleCopyAddress(!handleCopyAddress);
-                    setTimeout(() => {
-                      setHandleCopyAddress(false);
-                    }, 800);
+                    setHandleCopyAddress(true);
+                    setTimeout(() => setHandleCopyAddress(false), 800);
                   }}
                 >
                   {!handleCopyAddress ? (
                     <img
                       className="copy__icon"
                       src="/assets/svg/copy-created.svg"
-                      alt="link copy"
-                      style={{
-                        cursor: "pointer",
-                      }}
+                      alt="Copy address"
+                      style={{ cursor: "pointer" }}
                     />
                   ) : (
                     <img
                       src="/assets/png/copy.png"
-                      alt="copy"
+                      alt="Copied"
                       className="copy__icon"
                     />
                   )}

@@ -28,68 +28,63 @@ export interface Asset {
   name: string;
 }
 
-interface OwnedAsset {
-  amount: number;
-  "asset-id": number;
-  "is-frozen": boolean;
-}
 export interface NFT {
   amount: number;
   "asset-id": number;
   "is-frozen": boolean;
 }
 
-const resolveAssets = async (results: any) => {
-  const filteredTokens = results.filter(
-    (asset) => asset && asset.decimals !== 0
-  ) as Asset[];
-
-  const filteredNFTs = results.filter(
-    (asset) => asset && asset.decimals === 0 && asset.amount === 1
-  ) as Asset[];
-
-  return { tokens: filteredTokens, nfts: filteredNFTs };
-};
-
 export const computeAssets = async (vaultInfo, connection) => {
   try {
-    if (!vaultInfo.address) {
-      return;
+    // Ensure vaultInfo and address are valid
+    if (!vaultInfo?.address) {
+      throw new Error("Invalid vault information: address is missing.");
     }
 
-    // Transform balances object into an array
-    const assetsList = Object.entries(vaultInfo.balances).map(
-      ([key, value]) => ({
-        mint: key,
-        balance: value,
+    // Transform balances object into an array of assets
+    const assetsList = Object.entries(vaultInfo.balances || {}).map(
+      ([mint, balance]) => ({
+        mint,
+        balance: Number(balance), // Ensure balance is a number
       })
     );
 
-    if (!assetsList) {
-      return;
+    if (assetsList.length === 0) {
+      console.warn("No assets found in the vault.");
+      return { assets: [], nfts: [] };
     }
 
+    // Fetch asset details asynchronously
     const tokenPromises = assetsList.map(async (asset) => {
-      const tokenInfo = await getSolanaAssetName(asset.mint, connection);
-
-      if (!tokenInfo?.name) {
-        return null; // Skip if no valid name is found
+      try {
+        const tokenInfo = await getSolanaAssetName(asset.mint, connection);
+        return {
+          logo: tokenInfo?.logo || null,
+          name: tokenInfo?.name || "Unknown Token",
+          amount: asset.balance,
+        };
+      } catch (tokenError) {
+        console.error(
+          `Error fetching token info for ${asset.mint}:`,
+          tokenError
+        );
+        return null; // Skip problematic assets
       }
-
-      return {
-        logo: tokenInfo.logo || null,
-        name: tokenInfo.name,
-        amount: Number(asset.balance),
-      };
     });
 
-    const results = await Promise.all(tokenPromises);
+    // Resolve all promises and filter out any null values
+    const resolvedAssets = (await Promise.all(tokenPromises)).filter(Boolean);
 
     return {
-      assets: results ?? [],
-      nfts: [],
+      assets: resolvedAssets,
+      nfts: [], // Placeholder for NFTs; populate if needed
     };
   } catch (error) {
-    console.error("Error fetching or processing assets:", error);
+    console.error("Error computing assets:", error);
+    return {
+      assets: [],
+      nfts: [],
+      error,
+    };
   }
 };
