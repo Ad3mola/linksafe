@@ -17,6 +17,10 @@ import {
  * @returns {Promise<SolanaAsset | null>} - Asset details or an error message.
  */
 
+export const connection = new Connection(
+  `https://small-nameless-field.solana-mainnet.quiknode.pro/${import.meta.env.VITE_SOLANA_API_KEY}/`
+);
+
 export const getSolanaAssetName = async (
   mintAddress: string,
   connection: Connection
@@ -67,10 +71,6 @@ const useSolanaTokensAndNFTs = (
       try {
         setLoading(true);
         setError(null);
-
-        const connection = new Connection(
-          `https://small-nameless-field.solana-mainnet.quiknode.pro/${import.meta.env.VITE_SOLANA_API_KEY}/`
-        );
 
         const publicKey = new PublicKey(address);
 

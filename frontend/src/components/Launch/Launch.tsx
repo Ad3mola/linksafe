@@ -11,9 +11,8 @@ import PopUp from "../Popup";
 import QRCode from "qrcode.react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { claimVault } from "../../utils/integration";
-import { LoadingState } from "../LoadingState/LoadingState";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { useAppKitConnection } from "@reown/appkit-adapter-solana/react";
+import { connection } from "../../hooks/useSolanaWalletTokens";
 
 const REACT_APP_CLIENT_URL = import.meta.env.VITE_APP_CLIENT_URL;
 
@@ -28,8 +27,7 @@ const LaunchVault = () => {
   const [error, setError] = useState(false);
 
   const location = useLocation();
-  const { address, isConnected, status } = useAppKitAccount();
-  const { connection } = useAppKitConnection();
+  const { address, isConnected } = useAppKitAccount();
 
   // Fetch noble link for the vault
   const fetchVaultNobleLink = async () => {
@@ -56,7 +54,7 @@ const LaunchVault = () => {
     try {
       const assets = await computeAssets(vaultNobleLink, connection);
 
-      if (assets.error || !isConnected) {
+      if (assets.error) {
         throw new Error("Failed to fetch assets or connection issue.");
       }
 
@@ -122,7 +120,7 @@ const LaunchVault = () => {
             <CustomButton
               variant="filled"
               className="claim__button"
-              disabled={ownedAssets.assets.length === 0 || !isConnected}
+              disabled={ownedAssets.assets.length === 0}
               onClick={() => setShowPopup(true)}
             >
               Claim
