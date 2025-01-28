@@ -1,6 +1,6 @@
 {
   "name": "linksafe-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "LinkSafe SDK for Solana wallet management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -69,8 +69,9 @@ const useSolanaTokensAndNFTs = (
         setError(null);
 
         const connection = new Connection(
-          `https://${network}.api.syndica.io/api-key/${import.meta.env.VITE_SOLANA_API_KEY}`
+          `https://small-nameless-field.solana-mainnet.quiknode.pro/${import.meta.env.VITE_SOLANA_API_KEY}/`
         );
+
         const publicKey = new PublicKey(address);
 
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
