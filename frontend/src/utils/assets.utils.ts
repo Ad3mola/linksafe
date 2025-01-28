@@ -58,6 +58,10 @@ export const computeAssets = async (vaultInfo, connection) => {
     const tokenPromises = assetsList.map(async (asset) => {
       try {
         const tokenInfo = await getSolanaAssetName(asset.mint, connection);
+
+        if (!tokenInfo?.name) {
+          return; // Skip if no valid name is found
+        }
         return {
           logo: tokenInfo?.logo || null,
           name: tokenInfo?.name || "Unknown Token",

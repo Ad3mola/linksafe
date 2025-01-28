@@ -1,19 +1,15 @@
 // @ts-nocheck
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Card from "../Card";
 
-import { computeAssets, Asset, NFT } from "../../utils/assets.utils";
+import { computeAssets, Asset } from "../../utils/assets.utils";
 import CustomButton from "../Button";
-import { useSelector, useDispatch } from "react-redux";
 import { createSafe } from "linksafe-sdk";
-import { useNavigate } from "react-router-dom";
 import { CreatedLinkContainer } from "./Create-link.styles";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import QRCode from "qrcode.react";
 import AssetsShowcase from "../Assets-Showcase";
-import { PeraWalletConnect } from "@perawallet/connect";
-import { DeflyWalletConnect } from "@blockshake/defly-connect";
 import PopUp from "../Popup/Popup";
 import { errorToast, successToast } from "../../utils/customToast";
 import {
@@ -130,6 +126,10 @@ const CreateLink = () => {
       const { blockhash, lastValidBlockHeight } =
         await connection.getLatestBlockhash();
 
+      const scaledAmount = BigInt(
+        amount * Math.pow(10, selectedAsset.decimals)
+      );
+
       // Create transaction with required parameters
       const transaction = new Transaction({
         feePayer: publicKey,
@@ -162,7 +162,7 @@ const CreateLink = () => {
               sourceTokenAccount,
               vaultTokenAccount,
               publicKey,
-              amount
+              scaledAmount
             )
           );
 
