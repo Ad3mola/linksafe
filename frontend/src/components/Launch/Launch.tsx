@@ -28,14 +28,18 @@ const LaunchVault = () => {
   const [error, setError] = useState(false);
 
   const location = useLocation();
-  const { address } = useAppKitAccount();
+  const { address, isConnected, status } = useAppKitAccount();
   const { connection } = useAppKitConnection();
 
   // Fetch noble link for the vault
   const fetchVaultNobleLink = async () => {
-    const nobleCurveKey = `https://linksafe-reown.vercel.app${location.pathname}`;
+    const nobleCurveKey = `${REACT_APP_CLIENT_URL}${location.pathname}`;
     try {
       const res = await getSafe(nobleCurveKey);
+      if (!res) {
+        setError(true);
+        setIsLoading(false);
+      }
       setVaultNobleLink(res);
       return res;
     } catch (err) {
@@ -46,22 +50,24 @@ const LaunchVault = () => {
 
   // Fetch available assets
   const fetchAvailableAssets = async () => {
+    setIsLoading(true); // Ensure loading state is set at the beginning
+    setError(false); // Reset error state before fetching
+
     try {
       const assets = await computeAssets(vaultNobleLink, connection);
-      setOwnedAssets({ assets: assets.assets, nfts: assets.nfts });
 
-      if (assets.error) {
-        setError(true);
-      } else {
-        setIsLoading(false);
+      if (assets.error || !isConnected) {
+        throw new Error("Failed to fetch assets or connection issue.");
       }
+
+      setOwnedAssets({ assets: assets.assets || [], nfts: assets.nfts || [] });
     } catch (err) {
       console.error("Error fetching assets:", err);
       setError(true);
-      setIsLoading(false);
+    } finally {
+      setIsLoading(false); // Ensure loading is turned off in all cases
     }
   };
-
   // Fetch vault noble link on component mount
   useEffect(() => {
     (async () => {
@@ -74,7 +80,7 @@ const LaunchVault = () => {
     if (vaultNobleLink) {
       fetchAvailableAssets();
     }
-  }, [vaultNobleLink]);
+  }, [isConnected, vaultNobleLink]);
 
   // Handle claim action
   const handleClaim = async () => {
@@ -116,7 +122,7 @@ const LaunchVault = () => {
             <CustomButton
               variant="filled"
               className="claim__button"
-              disabled={ownedAssets.assets.length === 0}
+              disabled={ownedAssets.assets.length === 0 || !isConnected}
               onClick={() => setShowPopup(true)}
             >
               Claim
