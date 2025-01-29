@@ -10,7 +10,7 @@ import {
 
 /**
  * Fetch the name and logo of a Solana asset using its mint address.
- * Handles both token and NFT assets.
+ * Handles both token and NFT assets
  *
  * @param {string} mintAddress - The mint address of the asset.
  * @param {Connection} connection - Solana connection instance.
