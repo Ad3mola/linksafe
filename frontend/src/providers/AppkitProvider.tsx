@@ -17,6 +17,13 @@ const queryClient = new QueryClient();
 
 const projectId = import.meta.env.VITE_REOWN_APPKIT_PROJECT_ID;
 
+const metadata = {
+  name: "Linksafe",
+  description: "Linksafe Vault wallet",
+  url: "https://linksafe-reown.vercel.app/",
+  icons: [],
+};
+
 const networks: [AppKitNetwork, ...AppKitNetwork[]] = [
   solana,
   solanaTestnet,
@@ -27,6 +34,7 @@ createAppKit({
   adapters: [solanaWeb3JsAdapter],
   networks,
   projectId,
+  metadata,
   features: {
     onramp: true,
     swaps: true,
@@ -44,6 +52,7 @@ createAppKit({
   },
 
   allWallets: "SHOW",
+  enableWalletConnect: true,
 });
 
 console.log("AppKit initialized", solanaWeb3JsAdapter);

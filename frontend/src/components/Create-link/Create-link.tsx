@@ -56,16 +56,6 @@ const CreateLink = () => {
     }
   }, [status]);
 
-  const AVAILABLE_ASSETS = async () => {
-    const assets = await computeAssets(address, connection);
-    setOwnedAssets(assets ?? { tokens: [], nfts: [] });
-  };
-
-  useEffect(() => {
-    if (!address) return;
-    AVAILABLE_ASSETS();
-  }, [address]);
-
   const handleShare = async () => {
     try {
       if (navigator.share) {

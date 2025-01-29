@@ -18,7 +18,7 @@ import {
  */
 
 export const connection = new Connection(
-  `https://small-nameless-field.solana-mainnet.quiknode.pro/${import.meta.env.VITE_SOLANA_API_KEY}/`
+  `https://solana-mainnet.api.syndica.io/api-key/${import.meta.env.VITE_SOLANA_API_KEY}`
 );
 
 export const getSolanaAssetName = async (
