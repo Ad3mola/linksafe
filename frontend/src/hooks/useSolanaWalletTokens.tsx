@@ -10,7 +10,7 @@ import {
 
 /**
  * Fetch the name and logo of a Solana asset using its mint address.
- * Handles both token and NFT assets
+ * Handles both token and NFT assets.
  *
  * @param {string} mintAddress - The mint address of the asset.
  * @param {Connection} connection - Solana connection instance.
@@ -18,7 +18,8 @@ import {
  */
 
 export const connection = new Connection(
-  `https://solana-mainnet.api.syndica.io/api-key/${import.meta.env.VITE_SOLANA_API_KEY}`
+  `${import.meta.env.VITE_SOLANA_API}`,
+  "confirmed"
 );
 
 export const getSolanaAssetName = async (

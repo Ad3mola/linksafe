@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Card from "../Card";
 
-import { computeAssets, Asset } from "../../utils/assets.utils";
+import { Asset } from "../../utils/assets.utils";
 import CustomButton from "../Button";
-import { createSafe } from "linksafe-sdk";
 import { CreatedLinkContainer } from "./Create-link.styles";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import QRCode from "qrcode.react";
@@ -25,6 +24,7 @@ import {
   createAssociatedTokenAccountInstruction,
   createTransferInstruction,
 } from "@solana/spl-token";
+import { createSafe } from "../../sdk";
 
 const CreateLink = () => {
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
@@ -127,6 +127,8 @@ const CreateLink = () => {
         lastValidBlockHeight,
       });
 
+      console.log(createdVault);
+
       if (createdVault.address) {
         const sourceTokenAccount = await getAssociatedTokenAddress(
           mintPublicKey,
@@ -156,27 +158,18 @@ const CreateLink = () => {
             )
           );
 
-        const signedTx = await walletProvider.signTransaction(transaction, [
-          publicKey,
-        ]);
+        const signedTx = await walletProvider.signTransaction(transaction);
 
         const signature = await connection.sendRawTransaction(
           signedTx.serialize()
         );
-
-        await connection.confirmTransaction({
-          signature,
-          blockhash,
-          lastValidBlockHeight,
-        });
 
         successToast(`Transaction confirmed: ${signature}`);
 
         if (signature) {
           successToast("Solana Vault created and funded!");
           setCreatedVault({
-            safe: vaultAccount.publicKey.toString(),
-            address: vaultAccount.publicKey.toString(),
+            ...createdVault,
           });
           setIsVaultResolved(true);
           setCreatedVault(createdVault);

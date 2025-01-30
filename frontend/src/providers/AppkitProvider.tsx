@@ -50,8 +50,6 @@ createAppKit({
     ],
     emailShowWallets: true, // default to true
   },
-
-  allWallets: "SHOW",
   enableWalletConnect: true,
 });
 

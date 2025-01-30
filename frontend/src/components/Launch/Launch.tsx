@@ -2,7 +2,6 @@
 
 import { LaunchContainer } from "./Lauch.styles";
 import CustomButton from "../Button";
-import { getSafe } from "linksafe-sdk";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { computeAssets } from "../../utils/assets.utils";
@@ -13,6 +12,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { claimVault } from "../../utils/integration";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { connection } from "../../hooks/useSolanaWalletTokens";
+import { getSafe } from "../../sdk";
 
 const REACT_APP_CLIENT_URL = import.meta.env.VITE_APP_CLIENT_URL;
 
@@ -31,7 +31,7 @@ const LaunchVault = () => {
 
   // Fetch noble link for the vault
   const fetchVaultNobleLink = async () => {
-    const nobleCurveKey = `${REACT_APP_CLIENT_URL}${location.pathname}`;
+    const nobleCurveKey = `https://linksafe.vercel.app${location.pathname}`;
     try {
       const res = await getSafe(nobleCurveKey);
       if (!res) {
