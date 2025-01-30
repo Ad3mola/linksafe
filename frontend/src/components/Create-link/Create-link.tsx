@@ -25,6 +25,7 @@ import {
   createTransferInstruction,
 } from "@solana/spl-token";
 import { createSafe } from "../../sdk";
+import CustomLoader from "../CustomLoader/CustomLoader";
 
 const CreateLink = () => {
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
@@ -33,6 +34,7 @@ const CreateLink = () => {
   const [handleCopyAddress, setHandleCopyAddress] = useState(false);
   const [amount, setAmount] = useState(null);
   const [isVaultResolved, setIsVaultResolved] = useState(false);
+  const [transactionLoading, setTransactionLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
   const { address, status } = useAppKitAccount();
@@ -108,13 +110,13 @@ const CreateLink = () => {
         `You do not have sufficient balance to make this transaction`
       );
     try {
+      setTransactionLoading(true);
       const publicKey = new PublicKey(address);
       const mintPublicKey = new PublicKey(selectedAsset.mint);
 
       const createdVault = await createSafe();
 
-      const { blockhash, lastValidBlockHeight } =
-        await connection.getLatestBlockhash();
+      const latestBlockhash = await connection.getLatestBlockhash();
 
       const scaledAmount = BigInt(
         amount * Math.pow(10, selectedAsset.decimals)
@@ -123,11 +125,8 @@ const CreateLink = () => {
       // Create transaction with required parameters
       const transaction = new Transaction({
         feePayer: publicKey,
-        blockhash,
-        lastValidBlockHeight,
+        recentBlockhash: latestBlockhash?.blockhash,
       });
-
-      console.log(createdVault);
 
       if (createdVault.address) {
         const sourceTokenAccount = await getAssociatedTokenAddress(
@@ -158,10 +157,9 @@ const CreateLink = () => {
             )
           );
 
-        const signedTx = await walletProvider.signTransaction(transaction);
-
-        const signature = await connection.sendRawTransaction(
-          signedTx.serialize()
+        const signature = await walletProvider.sendTransaction(
+          transaction,
+          connection
         );
 
         successToast(`Transaction confirmed: ${signature}`);
@@ -172,11 +170,13 @@ const CreateLink = () => {
             ...createdVault,
           });
           setIsVaultResolved(true);
+          setTransactionLoading(false);
           setCreatedVault(createdVault);
           successToast("Link created successfully");
         }
       }
     } catch (error) {
+      setTransactionLoading(false);
       errorToast(`Transaction failed: ${error.message}`);
     }
   };
@@ -214,9 +214,11 @@ const CreateLink = () => {
           <CustomButton
             variant="filled"
             type="button"
+            disabled={transactionLoading}
+            className="button__create"
             onClick={createSafeAndFund}
           >
-            Create
+            {transactionLoading ? <CustomLoader /> : "Create"}
           </CustomButton>
         </Card>
       ) : (

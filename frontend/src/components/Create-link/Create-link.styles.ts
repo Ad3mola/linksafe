@@ -26,6 +26,12 @@ export const CreatedLinkContainer = styled.div`
     font-weight: 600;
   }
 
+  .button__create {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .qr__container {
     border: solid 1px var(--vault-primary);
     border-radius: 5px;
